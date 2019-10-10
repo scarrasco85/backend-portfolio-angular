@@ -14,6 +14,7 @@ var router = express.Router();
 router.get('/home', ProjectController.home);
 //Creamos ruta /test por el método post
 router.post('/test', ProjectController.test);
+router.post('/save-project', ProjectController.saveProject);
 
 //Exportamos el nuestro módulo router con toda la configuración de rutas
 module.exports = router;
