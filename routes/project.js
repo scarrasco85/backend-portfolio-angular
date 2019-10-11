@@ -15,6 +15,7 @@ router.get('/home', ProjectController.home);
 //Creamos ruta /test por el método post
 router.post('/test', ProjectController.test);
 router.post('/save-project', ProjectController.saveProject);
+router.get('/project/:id?', ProjectController.getProject);
 
 //Exportamos el nuestro módulo router con toda la configuración de rutas
 module.exports = router;

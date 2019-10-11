@@ -48,8 +48,28 @@ var controller = {
 			//devolvería el objeto dentro de una propiedad con el mismo nombre, es decir, projectStored
 			return res.status(200).send({project: projectStored});
 		});
+	},
 
+	//Método que devuelve un documento de la base de datos según su id
+	getProject: function(req, res){
+		var projectId = req.params.id;
+
+		//Controlamos si se ha pasado el parámetro id por la ruta ya que lo hemos definido opcional
+		if(projectId == null){
+			return res.status(404).send({message: 'No has concretado el id del proyecto a consultar.'});
+		} 
 		
+
+		//Con el método .findById de mongoose recuperamos la información del proyecto a buscar
+		Project.findById(projectId, (err, project) => {
+			if(err) return res.status(500).send({message: 'Error al devolver los datos, es posible que el formato del id no sea correcto'});
+
+			if(!project) return res.status(404).send({message: 'El proyecto con id='+projectId+' no existe.'});
+
+			return res.status(200).send({
+				project
+			});
+		});
 	}
 };
 
