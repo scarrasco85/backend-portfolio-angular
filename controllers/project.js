@@ -70,6 +70,20 @@ var controller = {
 				project
 			});
 		});
+	},
+
+	//Método que devuelve todos los proyectos que hay en la colección projects de nuestra base de datos portafolio_bd
+	getProjects: function(req, res){
+
+		//Usamos el método .find() de mongoose para conseguir todos los proyectos. Más información: https://mongoosejs.com/docs/api.html#model_Model.find
+		Project.find({}).exec((err, projects) => {
+
+			if(err) return res.status(500).send({message: 'Error al devolver los datos'});
+
+			if(!projects) return res.status(404).send({message: 'No hay proyectos para mostrar'});
+			//Si todo ha ido bien devolvemos un array de objetos JSON con todos los proyectos
+			return res.status(200).send({projects});
+		});
 	}
 };
 
