@@ -52,7 +52,7 @@ var controller = {
 
 	//Método que devuelve un documento de la base de datos según su id
 	getProject: function(req, res){
-		var projectId = req.params.id;
+		let projectId = req.params.id;
 
 		//Controlamos si se ha pasado el parámetro id por la ruta ya que lo hemos definido opcional
 		if(projectId == null){
@@ -83,6 +83,27 @@ var controller = {
 			if(!projects) return res.status(404).send({message: 'No hay proyectos para mostrar'});
 			//Si todo ha ido bien devolvemos un array de objetos JSON con todos los proyectos
 			return res.status(200).send({projects});
+		});
+	},
+
+	//Método que actualiza un proyecto por su id recibida por como parámetro por la url
+	updateProject: function(req, res){
+		
+		let projectId = req.params.id;
+		//Capturamos el body de la petición con todos los datos a actualizar
+		let update = req.body;
+
+		//Actualizamos el proyecto con la función .findByIdAndUpdate de mongoose. Con la opción {new:true}
+		//nos devuelve el objeto actualizado, si no nos devuelve el anterior
+		Project.findByIdAndUpdate(projectId, update, {new:true}, (err, projectUpdated) => {
+			if(err) return res.status(500).send({message: 'Error al actualizar el proyecto'});
+
+			if(!projectUpdated) return res.status(404).send({message: 'No existe el proyecto'});
+			
+			//Devolvemos el proyecto actualizado en la propiedad project
+			return res.status(200).send({
+				project: projectUpdated
+			});
 		});
 	}
 };
