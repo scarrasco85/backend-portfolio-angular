@@ -10,14 +10,13 @@ var router = express.Router();
 
 
 //** Creamos las rutas para el controlador /controllers/project **
-//Creamos la ruta /home por el método get al cuál le asignamos el método home: que creado en el controlador
 router.get('/home', ProjectController.home);
-//Creamos ruta /test por el método post
 router.post('/test', ProjectController.test);
 router.post('/save-project', ProjectController.saveProject);
 router.get('/project/:id?', ProjectController.getProject);
 router.get('/get-projects', ProjectController.getProjects);
-router.put('/project/:id', ProjectController.updateProject);
+router.put('/update-project/:id?', ProjectController.updateProject);
+router.delete('/delete-project/:id?', ProjectController.deleteProject);
 
 //Exportamos el nuestro módulo router con toda la configuración de rutas
 module.exports = router;

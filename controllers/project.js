@@ -90,19 +90,54 @@ var controller = {
 	updateProject: function(req, res){
 		
 		let projectId = req.params.id;
+		
+		
 		//Capturamos el body de la petición con todos los datos a actualizar
 		let update = req.body;
 
-		//Actualizamos el proyecto con la función .findByIdAndUpdate de mongoose. Con la opción {new:true}
-		//nos devuelve el objeto actualizado, si no nos devuelve el anterior
-		Project.findByIdAndUpdate(projectId, update, {new:true}, (err, projectUpdated) => {
-			if(err) return res.status(500).send({message: 'Error al actualizar el proyecto'});
+		//Controlamos si se ha pasado el id del proyecto
+		if(projectId == null){
+			return res.status(404).send({message: 'No has concretado el id del proyecto a actualizar.'});
+		} 
 
-			if(!projectUpdated) return res.status(404).send({message: 'No existe el proyecto'});
+		//Actualizamos el proyecto con la función .findByIdAndUpdate de mongoose. Con la opción {new:true}
+		//nos devuelve el documento actualizado, si no nos devuelve el anterior
+		Project.findByIdAndUpdate(projectId, update, {new:true}, (err, projectUpdated) => {
 			
-			//Devolvemos el proyecto actualizado en la propiedad project
+			if(err) return res.status(500).send({
+				message: 'Error al actualizar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo'
+			});
+
+			if(!projectUpdated) return res.status(404).send({message: 'Error al actualizar el proyecto. Es posible que el proyecto no exista en la base de datos'});
+			
+			//En caso positivo devolvemos el proyecto actualizado en la propiedad project
 			return res.status(200).send({
 				project: projectUpdated
+			});
+		});
+		
+	},
+
+	//Método que elimina un proyecto de la base de datos
+	deleteProject: function(req, res){
+		//recogemos id del proyecto
+		let projectId = req.params.id;
+
+		//Controlamos si se ha pasado el id del proyecto
+		if(projectId == null){
+			return res.status(404).send({message: 'No has concretado el id del proyecto a borrar.'});
+		}
+
+		//La función .findByIdAndDelete de mongoose elimina un documento por su id.
+		Project.findByIdAndDelete(projectId, (err, projectDeleted) => {
+
+			if(err) return res.status(500).send({message:'Error al eliminar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo'});
+
+			if(!projectDeleted) return res.status(404).send({message:'Error al eliminar el proyecto. Es posible que el proyecto no exista en la base de datos'});
+			
+			//En caso positivo devolvemos el proyecto eliminado
+			return res.status(200).send({
+				project: projectDeleted
 			});
 		});
 	}
