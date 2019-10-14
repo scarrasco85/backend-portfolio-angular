@@ -102,7 +102,7 @@ var controller = {
 
 		//Actualizamos el proyecto con la función .findByIdAndUpdate de mongoose. Con la opción {new:true}
 		//nos devuelve el documento actualizado, si no nos devuelve el anterior
-		Project.findByIdAndUpdate(projectId, update, {new:true}, (err, projectUpdated) => {
+		Project.findByIdAndUpdate(projectId, update, {new:true, useFindAndModify: false}, (err, projectUpdated) => {
 			
 			if(err) return res.status(500).send({
 				message: 'Error al actualizar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo'
@@ -128,8 +128,8 @@ var controller = {
 			return res.status(404).send({message: 'No has concretado el id del proyecto a borrar.'});
 		}
 
-		//La función .findByIdAndDelete de mongoose elimina un documento por su id.
-		Project.findByIdAndDelete(projectId, (err, projectDeleted) => {
+		//La función .findByIdAndRemove de mongoose elimina un documento por su id.
+		Project.findByIdAndRemove(projectId, (err, projectDeleted) => {
 
 			if(err) return res.status(500).send({message:'Error al eliminar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo'});
 
