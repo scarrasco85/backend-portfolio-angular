@@ -208,6 +208,31 @@ var controller = {
 					
 		}
 		
+	},
+
+	//Método que recupera una imagen del proyecto(sólo una) para usarla al listar los
+	//proyectos
+	getImageProject: function(req, res) {
+		//Nombre del archivo de imagen que recibiremos como parámetro
+		let file = req.params.image;
+		//ruta de la imagen
+		let pathFile = './uploads/img/'+file;
+		
+		//Usamos la librería fs importada arriba
+		//Primero comprobamos si el archivo existe
+		fs.exists(pathFile, (exists) => {
+			if(exists){
+				//si existe devolvemos el archivo de la imagen
+				//sendFile() es método de Express que devuelve un archivo.
+				//path.resolve() es método de node que resuelve una ruta a ruta absoluta si no lo es
+				return res.sendFile(path.resolve(pathFile));
+			}else{
+				return res.status(500).send({
+					message: "No existe la imagen..."
+				});
+			}
+		});
+		
 	}
 };
 

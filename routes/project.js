@@ -24,6 +24,7 @@ router.put('/update-project/:id?', ProjectController.updateProject);
 router.delete('/delete-project/:id?', ProjectController.deleteProject);
 //aplicamos el middleware dónde se subiran las imágenes
 router.post('/upload-image/:id?',multipartMiddleware, ProjectController.uploadImage);
+router.get('/get-image/:image', ProjectController.getImageProject);
 
 //Exportamos el nuestro módulo router con toda la configuración de rutas
 module.exports = router;
