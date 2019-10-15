@@ -20,7 +20,22 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 
-//** CORS
+//** Middleware para Configurar CABEZERAS y CORS
+/* Siempre se ejecutará antes de cada petición.
+   Nos configura las cabezeras.
+   Y pasa a la ejecución de lo siguiente, que será cargar las rutas
+   Con esto evitamos problemas cuando trabajemos con el manejo de peticiones desde el fron-end, permitiendo
+   el acceso de un origen a otro, de un dominio a otro.
+   Cuando vayamos a publicar nuestra aplicación en la (línea 34) en vez de poner '*' tendríamos que poner
+   la url permitida o los orígenes permitidos. -res.header('Access-Control-Allow-Origin', '*');
+*/
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+});
 
 // Añadimos middleware con las Rutas de los archivos de rutas cargados al objeto app
 //Añadimos las rutas de la entidad Project, añadiendole el segmento '/api' delante. Ej: /api/home para

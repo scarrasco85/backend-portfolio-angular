@@ -4,6 +4,8 @@
 
 //Cargamos-importamos el modelo Project
 var Project = require('../models/project');
+//Importamos-cargamos la librería File System de NodeJS para tratar archivos
+var fs = require('fs');
 
 
 //Creamos el controlador en un objeto JSON directamente con todas las funciones o métodos. 
@@ -140,6 +142,50 @@ var controller = {
 				project: projectDeleted
 			});
 		});
+	},
+
+	//Método que sube una imagen del proyecto a la base de datos
+	uploadImage: function(req, res) {
+		let projectId = req.params.id;
+		let fileName = "Imagen no subida...";
+
+		//Podemos recoger ficheros por la req porque instalamos previamente el módulo connect-multiparty de NodeJS
+		if(req.files){
+			//capturamos la ruta completa de la imagen
+			let filePath = req.files.image.path;
+			//capturamos el nombre del archivo de la ruta completa
+			let fileNameSplit = filePath.split('\\');
+			let fileName = fileNameSplit[2];
+			//capturamos la extension del archivo del nombre del archivo
+			let extSplit = fileName.split('\.');
+			let fileExt = extSplit[1]; 
+			
+			//Si la extensión del archivo es de una imagen guardamos el nombre 
+			if(fileExt == 'png' || fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'gif'){
+
+				//Actualizamos la propiedad image para que coincida con la imagen subida por el método post
+				//y la opción de fichero, es decir, en realidad la imagen ya se ha subido, ahora vamos a actualizar
+				//la propiedad image del proyecto para que el nombre coincida con el nombre de la imagen subida
+				Project.findByIdAndUpdate(projectId, {image: fileName}, {new: true}, (err, projectUpdated) => {
+					if(err) return res.status(500).send({message: "Error al subir la imagen"});
+
+					if(!projectUpdated) return res.status(404).send({message: "El proyecto no existe"});
+
+					return res.status(200).send({
+						project: projectUpdated
+					});
+						
+				});
+
+			}else{
+				//Si no es una imagen borramos el archivo ya que se guarda al ejecutar el método post
+				//usando el método .unlink() de la librería fs de NodeJS importada al principio del fichero
+				fs.unlink(filePath, (err) => {
+					res.status(200).send({message: "La extensión no es válida"});
+				});
+			}
+				
+		}
 	}
 };
 
