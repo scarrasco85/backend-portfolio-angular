@@ -11,7 +11,7 @@ var router = express.Router();
 //que no viene con NodeJS
 var multipart = require('connect-multiparty');
 //Creamos un middleware para indicar dónde se subiran los archivos
-var multipartMiddleware = multipart({uploadDir: './uploads'});
+var multipartMiddleware = multipart({uploadDir: './uploads/img'});
 
 
 //** Creamos las rutas para el controlador /controllers/project **

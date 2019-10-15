@@ -146,46 +146,68 @@ var controller = {
 
 	//Método que sube una imagen del proyecto a la base de datos
 	uploadImage: function(req, res) {
-		let projectId = req.params.id;
-		let fileName = "Imagen no subida...";
-
+		
 		//Podemos recoger ficheros por la req porque instalamos previamente el módulo connect-multiparty de NodeJS
 		if(req.files){
-			//capturamos la ruta completa de la imagen
+			let projectId = req.params.id;
 			let filePath = req.files.image.path;
-			//capturamos el nombre del archivo de la ruta completa
+			//capturamos el nombre del archivo de la ruta completa recibida
 			let fileNameSplit = filePath.split('\\');
 			let fileName = fileNameSplit[2];
-			//capturamos la extension del archivo del nombre del archivo
+			//capturamos la extension del archivo
 			let extSplit = fileName.split('\.');
 			let fileExt = extSplit[1]; 
-			
-			//Si la extensión del archivo es de una imagen guardamos el nombre 
-			if(fileExt == 'png' || fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'gif'){
 
-				//Actualizamos la propiedad image para que coincida con la imagen subida por el método post
-				//y la opción de fichero, es decir, en realidad la imagen ya se ha subido, ahora vamos a actualizar
-				//la propiedad image del proyecto para que el nombre coincida con el nombre de la imagen subida
-				Project.findByIdAndUpdate(projectId, {image: fileName}, {new: true}, (err, projectUpdated) => {
-					if(err) return res.status(500).send({message: "Error al subir la imagen"});
-
-					if(!projectUpdated) return res.status(404).send({message: "El proyecto no existe"});
-
-					return res.status(200).send({
-						project: projectUpdated
-					});
-						
-				});
-
-			}else{
-				//Si no es una imagen borramos el archivo ya que se guarda al ejecutar el método post
-				//usando el método .unlink() de la librería fs de NodeJS importada al principio del fichero
-				fs.unlink(filePath, (err) => {
-					res.status(200).send({message: "La extensión no es válida"});
-				});
-			}
+			//Controlamos si se ha pasado el id del proyecto
+			if(projectId == null){
 				
+				//Si no se ha proporcionado id borramos la imagen de la carpeta ya que se sube automaticamente al ejecutar
+				//la petición POST. Usanmos la función unlink() de la libreria fs de NodeJS
+				fs.unlink(filePath, (err) => {
+					res.status(404).send({message: "No has concretado el id del proyecto al cual quieres subir la imagen"});
+				});
+				
+			}else{
+
+				//Comprobamos que es una imagen
+				if(fileExt == 'png' || fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'gif'){
+					
+					//Actualizamos la propiedad image del proyecto para que el nombre coincida con el nombre de la imagen subida
+					Project.findByIdAndUpdate(projectId, {image: fileName}, {new: true}, (err, projectUpdated) => {
+						
+						if(err) {
+							
+							fs.unlink(filePath, (err) => {
+								if(err) res.status(500).send({error: err});
+							});
+							return res.status(500).send({message: "Error al subir la imagen. Es posible que el formato id proporcionado del proyecto sea erróneo"});
+						}
+
+						if(!projectUpdated)
+						{
+							fs.unlink(filePath, (err) => {
+								if(err) res.status(404).send({error: err});
+							});
+						 	return res.status(404).send({message: "Error al subir la imagen, es posible que el proyecto no exista"});
+						}
+
+						return res.status(200).send({
+							project: projectUpdated
+						});
+							
+					});
+
+				}else{
+					//Si no es una imagen borramos el archivo ya que se guarda al ejecutar el método post
+					//usando el método .unlink() de la librería fs de NodeJS importada al principio del fichero
+					fs.unlink(filePath, (err) => {
+						res.status(200).send({message: "La extensión no es válida"});
+					});
+				}
+			}	
+					
 		}
+		
 	}
 };
 
