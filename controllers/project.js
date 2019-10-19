@@ -6,6 +6,8 @@
 var Project = require('../models/project');
 //Importamos-cargamos la librería File System de NodeJS para tratar archivos
 var fs = require('fs');
+//Importamos el módulo de nodeJS que nos permite importar rutas de nuestro sistema de archivos
+var path = require('path');
 
 
 //Creamos el controlador en un objeto JSON directamente con todas las funciones o métodos. 
