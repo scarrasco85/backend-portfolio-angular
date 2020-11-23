@@ -9,12 +9,13 @@ var Schema = mongoose.Schema;
 //Creamos el esquema del modelo project con el que trabajaremos para crear nuevos documentos
 //dentro de nuestra colección projects de nuestra base de datos MongoDB
 var ProjectSchema = Schema({
-	name: String,
-	description: String,
-	category: String,
-	year: Number,
-	langs: String,
-	image: String
+    name: String,
+    description: String,
+    category: String,
+    year: Number,
+    langs: String,
+    image: String,
+    gitHub: String
 });
 
 

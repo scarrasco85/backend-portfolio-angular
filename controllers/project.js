@@ -39,6 +39,7 @@ var controller = {
         project.year = params.year;
         project.langs = params.langs;
         project.image = null;
+        project.gitHub = params.gitHub;
 
         //Médoto que guarda un proyecto en la base de datos
         //Usamos el método .save de mongoose, el cuál está cargado en el esquema del modelo Project(/models/project.js)
