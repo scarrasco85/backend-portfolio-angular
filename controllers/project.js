@@ -1,38 +1,23 @@
-/** Controlador de la entidad Project encargada de guardar información en la colección projects
-    de la base de datos **/
+/** Project Controller - Interacts between the Project entity and the database **/
 'use strict'
 
-//Cargamos-importamos el modelo Project
+//Project model
 var Project = require('../models/project');
-//Importamos-cargamos la librería File System de NodeJS para tratar archivos
+//Fyle System Library
 var fs = require('fs');
-//Importamos el módulo de nodeJS que nos permite importar rutas de nuestro sistema de archivos
+//Path module
 var path = require('path');
 
 
-//Creamos el controlador en un objeto JSON directamente con todas las funciones o métodos. 
-//También podríamos usar métodos separados que devuelvan un objeto JSON. 
+
 var controller = {
 
-    home: function(req, res) {
-        return res.status(200).send({
-            message: "Soy la home"
-        });
-    },
-
-    test: function(req, res) {
-        return res.status(200).send({
-            message: "Soy el método o acción test del controlador project"
-        });
-    },
-
-    //Método que guarda un elemento de proyecto en la base de datos
+    //Save project in bdd
     saveProject: function(req, res) {
-        let project = new Project();
 
-        //recogemos los parámetros que nos llegan por el body(post) de la petición
+        let project = new Project();
         let params = req.body;
-        //Asignamos los datos recibidos a cada una de las propiedades del objto project
+
         project.name = params.name;
         project.description = params.description;
         project.category = params.category;
@@ -41,35 +26,32 @@ var controller = {
         project.image = null;
         project.gitHub = params.gitHub;
 
-        //Médoto que guarda un proyecto en la base de datos
-        //Usamos el método .save de mongoose, el cuál está cargado en el esquema del modelo Project(/models/project.js)
-        //Función de callback que devuelve un error o el objeto guardado(a projectStored podemos llamarlo proyecto guardado o como queramos)
+        //Save in bdd with mongoose
         project.save((err, projectStored) => {
             //Si devuelve error
-            if (err) return res.status(500).send({ message: 'Error al guardar el documento.' });
+            if (err) return res.status(500).send({ message: 'Server error - Failed to save to database' });
             //Si no existe el objeto projectStored
-            if (!projectStored) return res.status(404).send({ message: 'No se ha podido guardar el proyecto' });
-            //Si todo ha ido bien devolvemos el objeto guardado dentro de una propiedad project, si no indicamos la propiedad
-            //devolvería el objeto dentro de una propiedad con el mismo nombre, es decir, projectStored
+            if (!projectStored) return res.status(404).send({ message: 'Failed to save to database' });
+
+            //The saved project is returned
             return res.status(200).send({ project: projectStored });
         });
     },
 
-    //Método que devuelve un documento de la base de datos según su id
+    //Get project by ID
     getProject: function(req, res) {
         let projectId = req.params.id;
 
-        //Controlamos si se ha pasado el parámetro id por la ruta ya que lo hemos definido opcional
         if (projectId == null) {
-            return res.status(404).send({ message: 'No has concretado el id del proyecto a consultar.' });
+            return res.status(404).send({ message: 'Error, project id is required' });
         }
 
 
-        //Con el método .findById de mongoose recuperamos la información del proyecto a buscar
+        //Query the database with mongoose
         Project.findById(projectId, (err, project) => {
-            if (err) return res.status(500).send({ message: 'Error al devolver los datos, es posible que el formato del id no sea correcto' });
+            if (err) return res.status(500).send({ message: 'Error returning data, the id format may not be correct' });
 
-            if (!project) return res.status(404).send({ message: 'El proyecto con id=' + projectId + ' no existe.' });
+            if (!project) return res.status(404).send({ message: 'The project with ID: ' + projectId + ' does not exist' });
 
             return res.status(200).send({
                 project
@@ -77,45 +59,43 @@ var controller = {
         });
     },
 
-    //Método que devuelve todos los proyectos que hay en la colección projects de nuestra base de datos portafolio_bd
+    //Get all projects
     getProjects: function(req, res) {
 
-        //Usamos el método .find() de mongoose para conseguir todos los proyectos. Más información: https://mongoosejs.com/docs/api.html#model_Model.find
+        //Query the database with mongoose
         Project.find({}).exec((err, projects) => {
 
-            if (err) return res.status(500).send({ message: 'Error al devolver los datos' });
+            if (err) return res.status(500).send({ message: 'Server error - Failed to get the information' });
 
-            if (!projects) return res.status(404).send({ message: 'No hay proyectos para mostrar' });
-            //Si todo ha ido bien devolvemos un array de objetos JSON con todos los proyectos
+            if (!projects) return res.status(404).send({ message: 'There are no projects to display' });
+            //All projects are returned
             return res.status(200).send({ projects });
         });
     },
 
-    //Método que actualiza un proyecto por su id recibida por como parámetro por la url
+    //Update project by ID
     updateProject: function(req, res) {
 
         let projectId = req.params.id;
 
 
-        //Capturamos el body de la petición con todos los datos a actualizar
+        //Info to update
         let update = req.body;
 
-        //Controlamos si se ha pasado el id del proyecto
         if (projectId == null) {
-            return res.status(404).send({ message: 'No has concretado el id del proyecto a actualizar.' });
+            return res.status(404).send({ message: 'Error, project id is required' });
         }
 
-        //Actualizamos el proyecto con la función .findByIdAndUpdate de mongoose. Con la opción {new:true}
-        //nos devuelve el documento actualizado, si no nos devuelve el anterior
+        //Query the database with mongoose
         Project.findByIdAndUpdate(projectId, update, { new: true, useFindAndModify: false }, (err, projectUpdated) => {
 
             if (err) return res.status(500).send({
-                message: 'Error al actualizar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo'
+                message: 'Error updating data, the id format may not be correct'
             });
 
-            if (!projectUpdated) return res.status(404).send({ message: 'Error al actualizar el proyecto. Es posible que el proyecto no exista en la base de datos' });
+            if (!projectUpdated) return res.status(404).send({ message: 'Error updating data. The project may not exist in the database' });
 
-            //En caso positivo devolvemos el proyecto actualizado en la propiedad project
+            //Data updated is returned
             return res.status(200).send({
                 project: projectUpdated
             });
@@ -123,59 +103,58 @@ var controller = {
 
     },
 
-    //Método que elimina un proyecto de la base de datos
+    //Delete project in bdd
     deleteProject: function(req, res) {
-        //recogemos id del proyecto
+
         let projectId = req.params.id;
 
-        //Controlamos si se ha pasado el id del proyecto
+
         if (projectId == null) {
-            return res.status(404).send({ message: 'No has concretado el id del proyecto a borrar.' });
+            return res.status(404).send({ message: 'Error, project id is required' });
         }
 
-        //La función .findByIdAndRemove de mongoose elimina un documento por su id.
+        //Query the database with mongoose
         Project.findByIdAndRemove(projectId, (err, projectDeleted) => {
 
-            if (err) return res.status(500).send({ message: 'Error al eliminar el proyecto. Es posible que el formato id proporcionado del proyecto sea erróneo' });
+            if (err) return res.status(500).send({ message: 'Error deleting data, the id format may not be correct' });
 
-            if (!projectDeleted) return res.status(404).send({ message: 'Error al eliminar el proyecto. Es posible que el proyecto no exista en la base de datos' });
+            if (!projectDeleted) return res.status(404).send({ message: 'Error deleting data. The project may not exist in the database' });
 
-            //En caso positivo devolvemos el proyecto eliminado
+            //Return data deleted
             return res.status(200).send({
                 project: projectDeleted
             });
         });
     },
 
-    //Método que sube una imagen del proyecto a la base de datos
+    //Updates the image property of a project. It is called when uploading an image to the server in the post request
     uploadImage: function(req, res) {
 
-        //Podemos recoger ficheros por la req porque instalamos previamente el módulo connect-multiparty de NodeJS
+
         if (req.files) {
             let projectId = req.params.id;
             let filePath = req.files.image.path;
-            //capturamos el nombre del archivo de la ruta completa recibida
+
             let fileNameSplit = filePath.split('/');
             let fileName = fileNameSplit[2];
-            //capturamos la extension del archivo
+
             let extSplit = fileName.split('\.');
             let fileExt = extSplit[1];
 
-            //Controlamos si se ha pasado el id del proyecto
+
             if (projectId == null) {
 
-                //Si no se ha proporcionado id borramos la imagen de la carpeta ya que se sube automaticamente al ejecutar
-                //la petición POST. Usanmos la función unlink() de la libreria fs de NodeJS
+                //If no project id was provided. It is necessary to delete the image from the folder because it is uploaded 
+                //automatically when executing the POST request. We use the unlink () function from the FyleSystem library
                 fs.unlink(filePath, (err) => {
-                    res.status(404).send({ message: "No has concretado el id del proyecto al cual quieres subir la imagen" });
+                    res.status(404).send({ message: "Error, project id is required" });
                 });
 
             } else {
 
-                //Comprobamos que es una imagen
                 if (fileExt == 'png' || fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'gif') {
 
-                    //Actualizamos la propiedad image del proyecto para que el nombre coincida con el nombre de la imagen subida
+                    //Query database with mongoose
                     Project.findByIdAndUpdate(projectId, { image: fileName }, { new: true }, (err, projectUpdated) => {
 
                         if (err) {
@@ -183,16 +162,17 @@ var controller = {
                             fs.unlink(filePath, (err) => {
                                 if (err) res.status(500).send({ error: err });
                             });
-                            return res.status(500).send({ message: "Error al subir la imagen. Es posible que el formato id proporcionado del proyecto sea erróneo" });
+                            return res.status(500).send({ message: "Image upload error. The provided project id format may be wrong" });
                         }
 
                         if (!projectUpdated) {
                             fs.unlink(filePath, (err) => {
                                 if (err) res.status(404).send({ error: err });
                             });
-                            return res.status(404).send({ message: "Error al subir la imagen, es posible que el proyecto no exista" });
+                            return res.status(404).send({ message: "Image upload error. The project may not exist in the database" });
                         }
 
+                        //Updated data is returned
                         return res.status(200).send({
                             project: projectUpdated
                         });
@@ -200,10 +180,9 @@ var controller = {
                     });
 
                 } else {
-                    //Si no es una imagen borramos el archivo ya que se guarda al ejecutar el método post
-                    //usando el método .unlink() de la librería fs de NodeJS importada al principio del fichero
+                    //If the file is not an image we delete it from the server folder
                     fs.unlink(filePath, (err) => {
-                        res.status(200).send({ message: "La extensión no es válida" });
+                        res.status(200).send({ message: "The file format is not accepted" });
                     });
                 }
             }
@@ -212,25 +191,21 @@ var controller = {
 
     },
 
-    //Método que recupera una imagen del proyecto(sólo una) para usarla al listar los
-    //proyectos
+    //Gets the path of a project image
     getImageProject: function(req, res) {
-        //Nombre del archivo de imagen que recibiremos como parámetro
+
         let file = req.params.image;
-        //ruta de la imagen
+
         let pathFile = './uploads/img/' + file;
 
-        //Usamos la librería fs importada arriba
-        //Primero comprobamos si el archivo existe
+
         fs.exists(pathFile, (exists) => {
             if (exists) {
-                //si existe devolvemos el archivo de la imagen
-                //sendFile() es método de Express que devuelve un archivo.
-                //path.resolve() es método de node que resuelve una ruta a ruta absoluta si no lo es
+
                 return res.sendFile(path.resolve(pathFile));
             } else {
                 return res.status(500).send({
-                    message: "No existe la imagen..."
+                    message: "The image no exist"
                 });
             }
         });
@@ -238,6 +213,4 @@ var controller = {
     }
 };
 
-
-//exportamos nuestro módulo(controlador) para poder usarlo con un require('controller')
 module.exports = controller;
