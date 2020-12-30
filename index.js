@@ -1,22 +1,22 @@
 'use strict'
 
-/** Conexión base de datos y Creación del servidor Express **/
-//Cargamos el módulo de mongoose usando la función require() de NodeJS
-var mongoose = require('mongoose');
-//Cargamos el módulo de Express creado en el archivo app.js
-var app = require('./app');
-var port = 3700;
+/** Database connection and Express server creation **/
 
-//Indicamos a mongoose que es una promesa
+const mongoose = require('mongoose');
+// app Express module
+const app = require('./app');
+const port = 3700;
+
+// Indicating to mongoose that it is a promise
 mongoose.Promise = global.Promise;
-//Realizamos la conexión a la base de datos
+// BDD conection
 mongoose.connect('mongodb://localhost:27017/portafolio_bd', { useNewUrlParser: true, useUnifiedTopology: true })
-		.then(() => {
-			console.log("Conexión a la base de datos establecida satisfactoriamente...");
+    .then(() => {
+        console.log("Conexión a la base de datos establecida satisfactoriamente...");
 
-			//Creación del servidor - usamos el metodo listen() de Express
-			app.listen(port, () => {
-				console.log("Servidor corriendo correctamente en la url: localhost:3700");
-			});
-		})
-		.catch(err => console.log(err));
+        // Starting Express server
+        app.listen(port, () => {
+            console.log("Servidor corriendo correctamente en la url: localhost:3700");
+        });
+    })
+    .catch(err => console.log(err));
