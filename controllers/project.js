@@ -12,6 +12,17 @@ const path = require('path');
 
 var controller = {
 
+    home: function(req, res) {
+        return res.status(200).send({
+            message: "Soy la home"
+        });
+    },
+
+    test: function(req, res) {
+        return res.status(200).send({
+            message: "Soy el método o acción test del controlador project"
+        });
+    },
     //Save project in bdd
     saveProject: function(req, res) {
 
