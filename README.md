@@ -1,25 +1,25 @@
 
 # Angular Portfolio Backend Server with NodeJS y MongoDB
 ---
-## What is Angular Portfolio Backend Server? 🤔
+## Qué es Angular Portfolio Backend Server? 🤔
 
-We are talking about a Restful Api for a portfolio that has CRUD of projects. It is consumed by the fronted app 'Portfolio Angular Frontend' and has been developed with NodeJS and MongoDB.
+Estamos hablando de una Api Rest para un portafolio que tiene las funcionalidades para realizar operaciones CRUD sobre los proyectos del Portafolio. Lo consume la aplicación front Portfolio Angular Frontend' y ha sido desarrollado con NodeJS, Express y MongoDB.
 
-## Installation 🔧
+## Instalación 🔧
 
-After cloning the repository remember to install the node modules:
+Después de clonar el repositorio recuerda instalar los node modules:
 ```
 npm install
 ```
-Start the server with the command:
+Inicia el servidor con el comando
 ```
 node index.js
 ```
-By default the server runs in: [](http://localhost:3700/).
-You can change it in the file 'index.js' 
+Por defecto, el servidor corre en: [](http://localhost:3700/).
+Puedes modificarlo en el archivo 'index.js' 
 
 ---
-## Technologies used 🛠️
+## Tecnologías usadas 🛠️
 - JavaScript
 - NodeJS
 - MongoDB
@@ -30,7 +30,7 @@ You can change it in the file 'index.js'
 - Postman
 - Heroku
 ---
-## Do you want to see the application running? 🚀
+## Quieres ver la aplicación corriendo? 🚀
 
-But remember that it is a backend application. 
-Coming soon!
+Pero recuerda que es una aplicación Back. 
+¡Muy pronto!
